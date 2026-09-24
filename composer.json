@@ -1,0 +1,82 @@
+{
+    "name": "cboxdk/laravel-audit-chain",
+    "description": "Cbox Audit Chain: a tamper-evident, hash-chained audit trail for Laravel, with signed checkpoints and external anchoring.",
+    "type": "library",
+    "keywords": [
+        "cbox",
+        "laravel",
+        "audit",
+        "audit-log",
+        "audit-trail",
+        "hash-chain",
+        "tamper-evident",
+        "ed25519",
+        "compliance"
+    ],
+    "license": "MIT",
+    "require": {
+        "php": "^8.4",
+        "ext-json": "*",
+        "ext-sodium": "*",
+        "illuminate/console": "^12.0 || ^13.0",
+        "illuminate/contracts": "^12.0 || ^13.0",
+        "illuminate/database": "^12.0 || ^13.0",
+        "illuminate/support": "^12.0 || ^13.0"
+    },
+    "require-dev": {
+        "larastan/larastan": "^3.0",
+        "laravel/pint": "^1.18",
+        "orchestra/testbench": "^10.0 || ^11.0",
+        "pestphp/pest": "^3.5 || ^4.0"
+    },
+    "bin": [
+        "bin/check-licenses.php",
+        "bin/generate-sbom.php"
+    ],
+    "autoload": {
+        "psr-4": {
+            "Cbox\\AuditChain\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Cbox\\AuditChain\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "lint": "pint --test",
+        "analyse": "phpstan analyse --no-progress --memory-limit=1G",
+        "test": "@php -d memory_limit=1G vendor/bin/pest",
+        "license-check": "@php bin/check-licenses.php",
+        "sbom": "@php bin/generate-sbom.php",
+        "sbom-check": "@php bin/generate-sbom.php --check",
+        "qa": [
+            "@lint",
+            "@analyse",
+            "@test",
+            "@license-check",
+            "@sbom-check",
+            "@composer audit --no-dev"
+        ]
+    },
+    "scripts-descriptions": {
+        "license-check": "Fail if any dependency is not permissively licensed (SBOM/compliance gate).",
+        "sbom": "Generate a CycloneDX 1.5 SBOM (sbom.json) from composer.lock.",
+        "qa": "Run the full quality gate: lint, static analysis, tests, license check, SBOM, security audit."
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Cbox\\AuditChain\\AuditChainServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

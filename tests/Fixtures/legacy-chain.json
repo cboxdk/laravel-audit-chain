@@ -1,0 +1,595 @@
+{
+    "_provenance": {
+        "source": "cboxdk/laravel-id tests/Fixtures/audit/golden-vectors.json (rows written by laravel-id v1.19.3 DatabaseAuditLog, before the chain moved into this package)",
+        "note": "A real chain written by a different implementation, with its own partition column (environment_id) and an extra hashed column (organization_id). Used to prove a custom EntryCodec lets this package verify and extend it without rewriting a row."
+    },
+    "rows": [
+        {
+            "id": "01m3agk7484k74dzav3kr6yh6s",
+            "environment_id": "__platform__",
+            "scope": "__system__",
+            "organization_id": null,
+            "sequence": 1,
+            "actor_type": "operator",
+            "actor_id": "op_1",
+            "action": "operator.login",
+            "target_type": null,
+            "target_id": null,
+            "context": "[]",
+            "ip": "198.51.100.7",
+            "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+            "hash": "01a37f8e3b8935ed3017020f419abe444fdb72cf76c5edb90733a504e5516e55",
+            "recorded_at": "2026-09-01 10:00:07"
+        },
+        {
+            "id": "01m3agk749c80dhn92j8r8ntk3",
+            "environment_id": "__platform__",
+            "scope": "__system__",
+            "organization_id": null,
+            "sequence": 2,
+            "actor_type": "operator",
+            "actor_id": "op_1",
+            "action": "operator.suspended_account",
+            "target_type": "organization",
+            "target_id": "01J8ZM0RGP0000000000000003",
+            "context": "{\"reason\":\"fraud review\",\"ticket\":\"OPS-4411\"}",
+            "ip": "2001:db8::1",
+            "prev_hash": "01a37f8e3b8935ed3017020f419abe444fdb72cf76c5edb90733a504e5516e55",
+            "hash": "404c85ad7d6fe69f650e0caa2b320b4e56c10717f1bd6bb04cc049b148a9dae7",
+            "recorded_at": "2026-09-01 10:01:07"
+        },
+        {
+            "id": "01m3agk74ajmjdzmvkde3hpsbb",
+            "environment_id": "__platform__",
+            "scope": "01J8ZM0RGP0000000000000003",
+            "organization_id": "01J8ZM0RGP0000000000000003",
+            "sequence": 1,
+            "actor_type": "organization_member",
+            "actor_id": "mem_9",
+            "action": "org.created",
+            "target_type": null,
+            "target_id": null,
+            "context": "[]",
+            "ip": null,
+            "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+            "hash": "5309058af5eb399769c7209f9f90a25f28df7236d556be8e885797c3263b0577",
+            "recorded_at": "2026-09-01 10:02:07"
+        },
+        {
+            "id": "01m3agk754qb5rpnzaee4y53be",
+            "environment_id": "__platform__",
+            "scope": "01J8ZM0RGP0000000000000003",
+            "organization_id": "01J8ZM0RGP0000000000000003",
+            "sequence": 2,
+            "actor_type": "organization_member",
+            "actor_id": "mem_9",
+            "action": "org.renamed",
+            "target_type": null,
+            "target_id": null,
+            "context": "{\"from\":\"Acme\",\"to\":\"Acme ApS\"}",
+            "ip": null,
+            "prev_hash": "5309058af5eb399769c7209f9f90a25f28df7236d556be8e885797c3263b0577",
+            "hash": "7fa9985a8fda2fb18e7ab9b1279fe646e320dd8e5f42b5f84da6abfac1e02b91",
+            "recorded_at": "2026-09-01 10:04:07"
+        },
+        {
+            "id": "01m3agk755q66ksjwh80h3cbde",
+            "environment_id": "__platform__",
+            "scope": "__system__",
+            "organization_id": null,
+            "sequence": 3,
+            "actor_type": "system",
+            "actor_id": null,
+            "action": "platform.maintenance",
+            "target_type": null,
+            "target_id": null,
+            "context": "{\"window\":{\"start\":\"02:00\",\"end\":\"02:30\"}}",
+            "ip": null,
+            "prev_hash": "404c85ad7d6fe69f650e0caa2b320b4e56c10717f1bd6bb04cc049b148a9dae7",
+            "hash": "3766245755c010fac90d95029b26347bc31ffbbbb1886830c779d3ddca8cd1b8",
+            "recorded_at": "2026-09-01 10:05:07"
+        },
+        {
+            "id": "01m3agk755q66ksjwh80h3cbdf",
+            "environment_id": "01J8ZK3V9Q4XW5T6Y7R8S9A0BC",
+            "scope": "__system__",
+            "organization_id": null,
+            "sequence": 1,
+            "actor_type": "system",
+            "actor_id": null,
+            "action": "environment.created",
+            "target_type": null,
+            "target_id": null,
+            "context": "[]",
+            "ip": null,
+            "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+            "hash": "079976ba6dc6465b1376a23fa5e9ca8ac68e9ad907c25f2965dd6a8b8a030e15",
+            "recorded_at": "2026-09-01 10:06:07"
+        },
+        {
+            "id": "01m3agk755q66ksjwh80h3cbdg",
+            "environment_id": "01J8ZK3V9Q4XW5T6Y7R8S9A0BC",
+            "scope": "01J8ZM0RGA0000000000000001",
+            "organization_id": "01J8ZM0RGA0000000000000001",
+            "sequence": 1,
+            "actor_type": "user",
+            "actor_id": "usr_01",
+            "action": "user.login",
+            "target_type": "session",
+            "target_id": "ses_01",
+            "context": "{\"zeta\":1,\"alpha\":{\"nested_z\":true,\"nested_a\":[3,1,2],\"m\":{\"y\":null,\"x\":false}},\"list\":[\"b\",\"a\",\"c\"],\"sparse\":{\"2\":\"two\",\"0\":\"zero\"},\"method\":\"password\"}",
+            "ip": "203.0.113.9",
+            "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+            "hash": "26f13c6f43e8da06a1bcd68d8cf8491669eaa0c925d303930d96f16cc80c6c7c",
+            "recorded_at": "2026-09-01 10:07:07"
+        },
+        {
+            "id": "01m3agk756n4g1es3w9e3matjy",
+            "environment_id": "01J8ZK3V9Q4XW5T6Y7R8S9A0BC",
+            "scope": "01J8ZM0RGA0000000000000001",
+            "organization_id": "01J8ZM0RGA0000000000000001",
+            "sequence": 2,
+            "actor_type": "user",
+            "actor_id": "usr_01",
+            "action": "user.profile_updated",
+            "target_type": "user",
+            "target_id": "usr_01",
+            "context": "{\"name\":\"S\\u00f8ren \\u00c6r\\u00f8 \\u00c5berg\",\"city\":\"\\u6771\\u4eac\",\"emoji\":\"\\ud83d\\udd10\\ud83d\\udc69\\u200d\\ud83d\\udcbb\",\"quote\":\"she said \\\"hi\\\"\",\"newline\":\"line1\\nline2\\ttab\",\"nul\":\"a\\u0000b\",\"rtl\":\"\\u0645\\u0631\\u062d\\u0628\\u0627\"}",
+            "ip": null,
+            "prev_hash": "26f13c6f43e8da06a1bcd68d8cf8491669eaa0c925d303930d96f16cc80c6c7c",
+            "hash": "8ae52739625843243700487011cbce60ca71f41646e72e9be40af487689ceb27",
+            "recorded_at": "2026-09-01 10:08:07"
+        },
+        {
+            "id": "01m3agk756n4g1es3w9e3matjz",
+            "environment_id": "01J8ZK3V9Q4XW5T6Y7R8S9A0BC",
+            "scope": "01J8ZM0RGA0000000000000001",
+            "organization_id": "01J8ZM0RGA0000000000000001",
+            "sequence": 3,
+            "actor_type": "service",
+            "actor_id": "client_7",
+            "action": "app.redirect_uri_added",
+            "target_type": "oauth_client",
+            "target_id": "client_7",
+            "context": "{\"uri\":\"https:\\/\\/app.example.test\\/callback\\/a\\/b?x=1&y=2\",\"windows\":\"C:\\\\Program Files\\\\Cbox\",\"html\":\"<\\/script><b>\",\"unicode_escape_literal\":\"\\\\u00e6\"}",
+            "ip": null,
+            "prev_hash": "8ae52739625843243700487011cbce60ca71f41646e72e9be40af487689ceb27",
+            "hash": "533420b1c4e3e5efda6ad4afb0caa3641108ee575359f68936d501b274ea7190",
+            "recorded_at": "2026-09-01 10:09:07"
+        },
+        {
+            "id": "01m3agk7576wpr96mhxdj9dftp",
+            "environment_id": "01J8ZK3V9Q4XW5T6Y7R8S9A0BC",
+            "scope": "01J8ZM0RGB0000000000000002",
+            "organization_id": "01J8ZM0RGB0000000000000002",
+            "sequence": 1,
+            "actor_type": "organization_member",
+            "actor_id": null,
+            "action": "invitation.created",
+            "target_type": null,
+            "target_id": "a.very.long.email.address+with.tag@subdomain.example.test",
+            "context": "{\"count\":42,\"negative\":-7,\"big\":9223372036854775807,\"ratio\":0.1,\"whole_float\":1,\"tiny\":1.5e-7,\"yes\":true,\"no\":false,\"nothing\":null,\"empty_list\":[],\"10\":\"ten\",\"9\":\"nine\",\"b\":\"bee\",\"a\":\"ay\"}",
+            "ip": null,
+            "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+            "hash": "26abe9225ff0fb4c18282b43d70f0b26c48efc0bd4df489585290860a112bf8b",
+            "recorded_at": "2026-09-01 10:10:07"
+        },
+        {
+            "id": "01m3agk7576wpr96mhxdj9dftq",
+            "environment_id": "01J8ZK3V9Q4XW5T6Y7R8S9A0BC",
+            "scope": "01J8ZM0RGA0000000000000001",
+            "organization_id": "01J8ZM0RGA0000000000000001",
+            "sequence": 4,
+            "actor_type": "system",
+            "actor_id": null,
+            "action": "role.assigned",
+            "target_type": "user",
+            "target_id": "usr_02",
+            "context": "{\"role_id\":\"admin\"}",
+            "ip": null,
+            "prev_hash": "533420b1c4e3e5efda6ad4afb0caa3641108ee575359f68936d501b274ea7190",
+            "hash": "ba66eea5580bbeb1897338fd9b1f2722725db2ea745a16ede22abc870179c354",
+            "recorded_at": "2026-09-01 10:11:07"
+        },
+        {
+            "id": "01m3agk76852jpvh52gdhnjyh8",
+            "environment_id": "01J8ZK3V9Q4XW5T6Y7R8S9A0BC",
+            "scope": "01J8ZM0RGA0000000000000001",
+            "organization_id": "01J8ZM0RGA0000000000000001",
+            "sequence": 5,
+            "actor_type": "operator",
+            "actor_id": "op_2",
+            "action": "role.revoked",
+            "target_type": "user",
+            "target_id": "usr_02",
+            "context": "{\"role_id\":\"admin\",\"by\":{\"kind\":\"operator\"}}",
+            "ip": null,
+            "prev_hash": "ba66eea5580bbeb1897338fd9b1f2722725db2ea745a16ede22abc870179c354",
+            "hash": "c25ef6223179af7c66eac4bdb123517b1a4f08d1bdb5ae98cdfae53e049a6d0c",
+            "recorded_at": "2026-09-01 10:13:07"
+        },
+        {
+            "id": "01m3agk76852jpvh52gdhnjyh9",
+            "environment_id": "01J8ZK3V9Q4XW5T6Y7R8S9A0BC",
+            "scope": "__system__",
+            "organization_id": null,
+            "sequence": 2,
+            "actor_type": "system",
+            "actor_id": null,
+            "action": "environment.keys_rotated",
+            "target_type": null,
+            "target_id": null,
+            "context": "{\"alg\":\"RS256\"}",
+            "ip": null,
+            "prev_hash": "079976ba6dc6465b1376a23fa5e9ca8ac68e9ad907c25f2965dd6a8b8a030e15",
+            "hash": "b9211708405fc3bbdb3366d1717de6e9939a93d05d6fea5057e519dda0100813",
+            "recorded_at": "2026-09-01 10:14:07"
+        },
+        {
+            "id": "01m3agk769hcy5bh9b4jws1ybb",
+            "environment_id": "01J8ZK3V9Q4XW5T6Y7R8S9A0BD",
+            "scope": "01J8ZM0RGA0000000000000001",
+            "organization_id": "01J8ZM0RGA0000000000000001",
+            "sequence": 1,
+            "actor_type": "user",
+            "actor_id": "usr_01",
+            "action": "user.login",
+            "target_type": null,
+            "target_id": null,
+            "context": "{\"method\":\"passkey\"}",
+            "ip": null,
+            "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+            "hash": "5152f68bf50ac2baa6a84ac2a61774b991b958122e7678b8c2385d2e117406bd",
+            "recorded_at": "2026-09-01 10:15:07"
+        },
+        {
+            "id": "01m3agk769hcy5bh9b4jws1ybc",
+            "environment_id": "01J8ZK3V9Q4XW5T6Y7R8S9A0BD",
+            "scope": "01J8ZM0RGA0000000000000001",
+            "organization_id": "01J8ZM0RGA0000000000000001",
+            "sequence": 2,
+            "actor_type": "user",
+            "actor_id": "usr_01",
+            "action": "user.logout",
+            "target_type": null,
+            "target_id": null,
+            "context": "[]",
+            "ip": null,
+            "prev_hash": "5152f68bf50ac2baa6a84ac2a61774b991b958122e7678b8c2385d2e117406bd",
+            "hash": "03c46fcb17a93c4af23a43cc6063231335b07fa94cb0962e09e2ac13adf950d7",
+            "recorded_at": "2026-09-01 10:16:07"
+        }
+    ],
+    "records": [
+        {
+            "partition": "__platform__",
+            "at": "2026-09-01T10:00:07+00:00",
+            "event": {
+                "action": "operator.login",
+                "actor_type": "operator",
+                "actor_id": "op_1",
+                "organization_id": null,
+                "target_type": null,
+                "target_id": null,
+                "context_php": "a:0:{}",
+                "ip": "198.51.100.7"
+            },
+            "expect": {
+                "environment_id": "__platform__",
+                "scope": "__system__",
+                "sequence": 1,
+                "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+                "hash": "01a37f8e3b8935ed3017020f419abe444fdb72cf76c5edb90733a504e5516e55",
+                "canonical": "{\"sequence\":1,\"environment_id\":\"__platform__\",\"scope\":\"__system__\",\"organization_id\":null,\"actor_type\":\"operator\",\"actor_id\":\"op_1\",\"action\":\"operator.login\",\"target_type\":null,\"target_id\":null,\"context\":[],\"ip\":\"198.51.100.7\",\"recorded_at\":1788256807}"
+            }
+        },
+        {
+            "partition": "__platform__",
+            "at": "2026-09-01T10:01:07+00:00",
+            "event": {
+                "action": "operator.suspended_account",
+                "actor_type": "operator",
+                "actor_id": "op_1",
+                "organization_id": null,
+                "target_type": "organization",
+                "target_id": "01J8ZM0RGP0000000000000003",
+                "context_php": "a:2:{s:6:\"reason\";s:12:\"fraud review\";s:6:\"ticket\";s:8:\"OPS-4411\";}",
+                "ip": "2001:db8::1"
+            },
+            "expect": {
+                "environment_id": "__platform__",
+                "scope": "__system__",
+                "sequence": 2,
+                "prev_hash": "01a37f8e3b8935ed3017020f419abe444fdb72cf76c5edb90733a504e5516e55",
+                "hash": "404c85ad7d6fe69f650e0caa2b320b4e56c10717f1bd6bb04cc049b148a9dae7",
+                "canonical": "{\"sequence\":2,\"environment_id\":\"__platform__\",\"scope\":\"__system__\",\"organization_id\":null,\"actor_type\":\"operator\",\"actor_id\":\"op_1\",\"action\":\"operator.suspended_account\",\"target_type\":\"organization\",\"target_id\":\"01J8ZM0RGP0000000000000003\",\"context\":{\"reason\":\"fraud review\",\"ticket\":\"OPS-4411\"},\"ip\":\"2001:db8::1\",\"recorded_at\":1788256867}"
+            }
+        },
+        {
+            "partition": "__platform__",
+            "at": "2026-09-01T10:02:07+00:00",
+            "event": {
+                "action": "org.created",
+                "actor_type": "organization_member",
+                "actor_id": "mem_9",
+                "organization_id": "01J8ZM0RGP0000000000000003",
+                "target_type": null,
+                "target_id": null,
+                "context_php": "a:0:{}",
+                "ip": null
+            },
+            "expect": {
+                "environment_id": "__platform__",
+                "scope": "01J8ZM0RGP0000000000000003",
+                "sequence": 1,
+                "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+                "hash": "5309058af5eb399769c7209f9f90a25f28df7236d556be8e885797c3263b0577",
+                "canonical": "{\"sequence\":1,\"environment_id\":\"__platform__\",\"scope\":\"01J8ZM0RGP0000000000000003\",\"organization_id\":\"01J8ZM0RGP0000000000000003\",\"actor_type\":\"organization_member\",\"actor_id\":\"mem_9\",\"action\":\"org.created\",\"target_type\":null,\"target_id\":null,\"context\":[],\"ip\":null,\"recorded_at\":1788256927}"
+            }
+        },
+        {
+            "partition": "__platform__",
+            "at": "2026-09-01T10:04:07+00:00",
+            "event": {
+                "action": "org.renamed",
+                "actor_type": "organization_member",
+                "actor_id": "mem_9",
+                "organization_id": "01J8ZM0RGP0000000000000003",
+                "target_type": null,
+                "target_id": null,
+                "context_php": "a:2:{s:4:\"from\";s:4:\"Acme\";s:2:\"to\";s:8:\"Acme ApS\";}",
+                "ip": null
+            },
+            "expect": {
+                "environment_id": "__platform__",
+                "scope": "01J8ZM0RGP0000000000000003",
+                "sequence": 2,
+                "prev_hash": "5309058af5eb399769c7209f9f90a25f28df7236d556be8e885797c3263b0577",
+                "hash": "7fa9985a8fda2fb18e7ab9b1279fe646e320dd8e5f42b5f84da6abfac1e02b91",
+                "canonical": "{\"sequence\":2,\"environment_id\":\"__platform__\",\"scope\":\"01J8ZM0RGP0000000000000003\",\"organization_id\":\"01J8ZM0RGP0000000000000003\",\"actor_type\":\"organization_member\",\"actor_id\":\"mem_9\",\"action\":\"org.renamed\",\"target_type\":null,\"target_id\":null,\"context\":{\"from\":\"Acme\",\"to\":\"Acme ApS\"},\"ip\":null,\"recorded_at\":1788257047}"
+            }
+        },
+        {
+            "partition": "__platform__",
+            "at": "2026-09-01T10:05:07+00:00",
+            "event": {
+                "action": "platform.maintenance",
+                "actor_type": "system",
+                "actor_id": null,
+                "organization_id": null,
+                "target_type": null,
+                "target_id": null,
+                "context_php": "a:1:{s:6:\"window\";a:2:{s:5:\"start\";s:5:\"02:00\";s:3:\"end\";s:5:\"02:30\";}}",
+                "ip": null
+            },
+            "expect": {
+                "environment_id": "__platform__",
+                "scope": "__system__",
+                "sequence": 3,
+                "prev_hash": "404c85ad7d6fe69f650e0caa2b320b4e56c10717f1bd6bb04cc049b148a9dae7",
+                "hash": "3766245755c010fac90d95029b26347bc31ffbbbb1886830c779d3ddca8cd1b8",
+                "canonical": "{\"sequence\":3,\"environment_id\":\"__platform__\",\"scope\":\"__system__\",\"organization_id\":null,\"actor_type\":\"system\",\"actor_id\":null,\"action\":\"platform.maintenance\",\"target_type\":null,\"target_id\":null,\"context\":{\"window\":{\"end\":\"02:30\",\"start\":\"02:00\"}},\"ip\":null,\"recorded_at\":1788257107}"
+            }
+        },
+        {
+            "partition": "01J8ZK3V9Q4XW5T6Y7R8S9A0BC",
+            "at": "2026-09-01T10:06:07+00:00",
+            "event": {
+                "action": "environment.created",
+                "actor_type": "system",
+                "actor_id": null,
+                "organization_id": null,
+                "target_type": null,
+                "target_id": null,
+                "context_php": "a:0:{}",
+                "ip": null
+            },
+            "expect": {
+                "environment_id": "01J8ZK3V9Q4XW5T6Y7R8S9A0BC",
+                "scope": "__system__",
+                "sequence": 1,
+                "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+                "hash": "079976ba6dc6465b1376a23fa5e9ca8ac68e9ad907c25f2965dd6a8b8a030e15",
+                "canonical": "{\"sequence\":1,\"environment_id\":\"01J8ZK3V9Q4XW5T6Y7R8S9A0BC\",\"scope\":\"__system__\",\"organization_id\":null,\"actor_type\":\"system\",\"actor_id\":null,\"action\":\"environment.created\",\"target_type\":null,\"target_id\":null,\"context\":[],\"ip\":null,\"recorded_at\":1788257167}"
+            }
+        },
+        {
+            "partition": "01J8ZK3V9Q4XW5T6Y7R8S9A0BC",
+            "at": "2026-09-01T10:07:07+00:00",
+            "event": {
+                "action": "user.login",
+                "actor_type": "user",
+                "actor_id": "usr_01",
+                "organization_id": "01J8ZM0RGA0000000000000001",
+                "target_type": "session",
+                "target_id": "ses_01",
+                "context_php": "a:5:{s:4:\"zeta\";i:1;s:5:\"alpha\";a:3:{s:8:\"nested_z\";b:1;s:8:\"nested_a\";a:3:{i:0;i:3;i:1;i:1;i:2;i:2;}s:1:\"m\";a:2:{s:1:\"y\";N;s:1:\"x\";b:0;}}s:4:\"list\";a:3:{i:0;s:1:\"b\";i:1;s:1:\"a\";i:2;s:1:\"c\";}s:6:\"sparse\";a:2:{i:2;s:3:\"two\";i:0;s:4:\"zero\";}s:6:\"method\";s:8:\"password\";}",
+                "ip": "203.0.113.9"
+            },
+            "expect": {
+                "environment_id": "01J8ZK3V9Q4XW5T6Y7R8S9A0BC",
+                "scope": "01J8ZM0RGA0000000000000001",
+                "sequence": 1,
+                "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+                "hash": "26f13c6f43e8da06a1bcd68d8cf8491669eaa0c925d303930d96f16cc80c6c7c",
+                "canonical": "{\"sequence\":1,\"environment_id\":\"01J8ZK3V9Q4XW5T6Y7R8S9A0BC\",\"scope\":\"01J8ZM0RGA0000000000000001\",\"organization_id\":\"01J8ZM0RGA0000000000000001\",\"actor_type\":\"user\",\"actor_id\":\"usr_01\",\"action\":\"user.login\",\"target_type\":\"session\",\"target_id\":\"ses_01\",\"context\":{\"alpha\":{\"m\":{\"x\":false,\"y\":null},\"nested_a\":[3,1,2],\"nested_z\":true},\"list\":[\"b\",\"a\",\"c\"],\"method\":\"password\",\"sparse\":{\"0\":\"zero\",\"2\":\"two\"},\"zeta\":1},\"ip\":\"203.0.113.9\",\"recorded_at\":1788257227}"
+            }
+        },
+        {
+            "partition": "01J8ZK3V9Q4XW5T6Y7R8S9A0BC",
+            "at": "2026-09-01T10:08:07+00:00",
+            "event": {
+                "action": "user.profile_updated",
+                "actor_type": "user",
+                "actor_id": "usr_01",
+                "organization_id": "01J8ZM0RGA0000000000000001",
+                "target_type": "user",
+                "target_id": "usr_01",
+                "context_php": "a:7:{s:4:\"name\";s:19:\"Søren Ærø Åberg\";s:4:\"city\";s:6:\"東京\";s:5:\"emoji\";s:15:\"🔐👩‍💻\";s:5:\"quote\";s:13:\"she said \"hi\"\";s:7:\"newline\";s:15:\"line1\nline2\ttab\";s:3:\"nul\";s:3:\"a\u0000b\";s:3:\"rtl\";s:10:\"مرحبا\";}",
+                "ip": null
+            },
+            "expect": {
+                "environment_id": "01J8ZK3V9Q4XW5T6Y7R8S9A0BC",
+                "scope": "01J8ZM0RGA0000000000000001",
+                "sequence": 2,
+                "prev_hash": "26f13c6f43e8da06a1bcd68d8cf8491669eaa0c925d303930d96f16cc80c6c7c",
+                "hash": "8ae52739625843243700487011cbce60ca71f41646e72e9be40af487689ceb27",
+                "canonical": "{\"sequence\":2,\"environment_id\":\"01J8ZK3V9Q4XW5T6Y7R8S9A0BC\",\"scope\":\"01J8ZM0RGA0000000000000001\",\"organization_id\":\"01J8ZM0RGA0000000000000001\",\"actor_type\":\"user\",\"actor_id\":\"usr_01\",\"action\":\"user.profile_updated\",\"target_type\":\"user\",\"target_id\":\"usr_01\",\"context\":{\"city\":\"東京\",\"emoji\":\"🔐👩‍💻\",\"name\":\"Søren Ærø Åberg\",\"newline\":\"line1\\nline2\\ttab\",\"nul\":\"a\\u0000b\",\"quote\":\"she said \\\"hi\\\"\",\"rtl\":\"مرحبا\"},\"ip\":null,\"recorded_at\":1788257287}"
+            }
+        },
+        {
+            "partition": "01J8ZK3V9Q4XW5T6Y7R8S9A0BC",
+            "at": "2026-09-01T10:09:07+00:00",
+            "event": {
+                "action": "app.redirect_uri_added",
+                "actor_type": "service",
+                "actor_id": "client_7",
+                "organization_id": "01J8ZM0RGA0000000000000001",
+                "target_type": "oauth_client",
+                "target_id": "client_7",
+                "context_php": "a:4:{s:3:\"uri\";s:45:\"https://app.example.test/callback/a/b?x=1&y=2\";s:7:\"windows\";s:21:\"C:\\Program Files\\Cbox\";s:4:\"html\";s:12:\"</script><b>\";s:22:\"unicode_escape_literal\";s:6:\"\\u00e6\";}",
+                "ip": null
+            },
+            "expect": {
+                "environment_id": "01J8ZK3V9Q4XW5T6Y7R8S9A0BC",
+                "scope": "01J8ZM0RGA0000000000000001",
+                "sequence": 3,
+                "prev_hash": "8ae52739625843243700487011cbce60ca71f41646e72e9be40af487689ceb27",
+                "hash": "533420b1c4e3e5efda6ad4afb0caa3641108ee575359f68936d501b274ea7190",
+                "canonical": "{\"sequence\":3,\"environment_id\":\"01J8ZK3V9Q4XW5T6Y7R8S9A0BC\",\"scope\":\"01J8ZM0RGA0000000000000001\",\"organization_id\":\"01J8ZM0RGA0000000000000001\",\"actor_type\":\"service\",\"actor_id\":\"client_7\",\"action\":\"app.redirect_uri_added\",\"target_type\":\"oauth_client\",\"target_id\":\"client_7\",\"context\":{\"html\":\"</script><b>\",\"unicode_escape_literal\":\"\\\\u00e6\",\"uri\":\"https://app.example.test/callback/a/b?x=1&y=2\",\"windows\":\"C:\\\\Program Files\\\\Cbox\"},\"ip\":null,\"recorded_at\":1788257347}"
+            }
+        },
+        {
+            "partition": "01J8ZK3V9Q4XW5T6Y7R8S9A0BC",
+            "at": "2026-09-01T10:10:07+00:00",
+            "event": {
+                "action": "invitation.created",
+                "actor_type": "organization_member",
+                "actor_id": null,
+                "organization_id": "01J8ZM0RGB0000000000000002",
+                "target_type": null,
+                "target_id": "a.very.long.email.address+with.tag@subdomain.example.test",
+                "context_php": "a:14:{s:5:\"count\";i:42;s:8:\"negative\";i:-7;s:3:\"big\";i:9223372036854775807;s:5:\"ratio\";d:0.1;s:11:\"whole_float\";d:1;s:4:\"tiny\";d:1.5E-7;s:3:\"yes\";b:1;s:2:\"no\";b:0;s:7:\"nothing\";N;s:10:\"empty_list\";a:0:{}i:10;s:3:\"ten\";i:9;s:4:\"nine\";s:1:\"b\";s:3:\"bee\";s:1:\"a\";s:2:\"ay\";}",
+                "ip": null
+            },
+            "expect": {
+                "environment_id": "01J8ZK3V9Q4XW5T6Y7R8S9A0BC",
+                "scope": "01J8ZM0RGB0000000000000002",
+                "sequence": 1,
+                "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+                "hash": "26abe9225ff0fb4c18282b43d70f0b26c48efc0bd4df489585290860a112bf8b",
+                "canonical": "{\"sequence\":1,\"environment_id\":\"01J8ZK3V9Q4XW5T6Y7R8S9A0BC\",\"scope\":\"01J8ZM0RGB0000000000000002\",\"organization_id\":\"01J8ZM0RGB0000000000000002\",\"actor_type\":\"organization_member\",\"actor_id\":null,\"action\":\"invitation.created\",\"target_type\":null,\"target_id\":\"a.very.long.email.address+with.tag@subdomain.example.test\",\"context\":{\"9\":\"nine\",\"10\":\"ten\",\"a\":\"ay\",\"b\":\"bee\",\"big\":9223372036854775807,\"count\":42,\"empty_list\":[],\"negative\":-7,\"no\":false,\"nothing\":null,\"ratio\":0.1,\"tiny\":1.5e-7,\"whole_float\":1,\"yes\":true},\"ip\":null,\"recorded_at\":1788257407}"
+            }
+        },
+        {
+            "partition": "01J8ZK3V9Q4XW5T6Y7R8S9A0BC",
+            "at": "2026-09-01T10:11:07+00:00",
+            "event": {
+                "action": "role.assigned",
+                "actor_type": "system",
+                "actor_id": null,
+                "organization_id": "01J8ZM0RGA0000000000000001",
+                "target_type": "user",
+                "target_id": "usr_02",
+                "context_php": "a:1:{s:7:\"role_id\";s:5:\"admin\";}",
+                "ip": null
+            },
+            "expect": {
+                "environment_id": "01J8ZK3V9Q4XW5T6Y7R8S9A0BC",
+                "scope": "01J8ZM0RGA0000000000000001",
+                "sequence": 4,
+                "prev_hash": "533420b1c4e3e5efda6ad4afb0caa3641108ee575359f68936d501b274ea7190",
+                "hash": "ba66eea5580bbeb1897338fd9b1f2722725db2ea745a16ede22abc870179c354",
+                "canonical": "{\"sequence\":4,\"environment_id\":\"01J8ZK3V9Q4XW5T6Y7R8S9A0BC\",\"scope\":\"01J8ZM0RGA0000000000000001\",\"organization_id\":\"01J8ZM0RGA0000000000000001\",\"actor_type\":\"system\",\"actor_id\":null,\"action\":\"role.assigned\",\"target_type\":\"user\",\"target_id\":\"usr_02\",\"context\":{\"role_id\":\"admin\"},\"ip\":null,\"recorded_at\":1788257467}"
+            }
+        },
+        {
+            "partition": "01J8ZK3V9Q4XW5T6Y7R8S9A0BC",
+            "at": "2026-09-01T10:13:07+00:00",
+            "event": {
+                "action": "role.revoked",
+                "actor_type": "operator",
+                "actor_id": "op_2",
+                "organization_id": "01J8ZM0RGA0000000000000001",
+                "target_type": "user",
+                "target_id": "usr_02",
+                "context_php": "a:2:{s:7:\"role_id\";s:5:\"admin\";s:2:\"by\";a:1:{s:4:\"kind\";s:8:\"operator\";}}",
+                "ip": null
+            },
+            "expect": {
+                "environment_id": "01J8ZK3V9Q4XW5T6Y7R8S9A0BC",
+                "scope": "01J8ZM0RGA0000000000000001",
+                "sequence": 5,
+                "prev_hash": "ba66eea5580bbeb1897338fd9b1f2722725db2ea745a16ede22abc870179c354",
+                "hash": "c25ef6223179af7c66eac4bdb123517b1a4f08d1bdb5ae98cdfae53e049a6d0c",
+                "canonical": "{\"sequence\":5,\"environment_id\":\"01J8ZK3V9Q4XW5T6Y7R8S9A0BC\",\"scope\":\"01J8ZM0RGA0000000000000001\",\"organization_id\":\"01J8ZM0RGA0000000000000001\",\"actor_type\":\"operator\",\"actor_id\":\"op_2\",\"action\":\"role.revoked\",\"target_type\":\"user\",\"target_id\":\"usr_02\",\"context\":{\"by\":{\"kind\":\"operator\"},\"role_id\":\"admin\"},\"ip\":null,\"recorded_at\":1788257587}"
+            }
+        },
+        {
+            "partition": "01J8ZK3V9Q4XW5T6Y7R8S9A0BC",
+            "at": "2026-09-01T10:14:07+00:00",
+            "event": {
+                "action": "environment.keys_rotated",
+                "actor_type": "system",
+                "actor_id": null,
+                "organization_id": null,
+                "target_type": null,
+                "target_id": null,
+                "context_php": "a:1:{s:3:\"alg\";s:5:\"RS256\";}",
+                "ip": null
+            },
+            "expect": {
+                "environment_id": "01J8ZK3V9Q4XW5T6Y7R8S9A0BC",
+                "scope": "__system__",
+                "sequence": 2,
+                "prev_hash": "079976ba6dc6465b1376a23fa5e9ca8ac68e9ad907c25f2965dd6a8b8a030e15",
+                "hash": "b9211708405fc3bbdb3366d1717de6e9939a93d05d6fea5057e519dda0100813",
+                "canonical": "{\"sequence\":2,\"environment_id\":\"01J8ZK3V9Q4XW5T6Y7R8S9A0BC\",\"scope\":\"__system__\",\"organization_id\":null,\"actor_type\":\"system\",\"actor_id\":null,\"action\":\"environment.keys_rotated\",\"target_type\":null,\"target_id\":null,\"context\":{\"alg\":\"RS256\"},\"ip\":null,\"recorded_at\":1788257647}"
+            }
+        },
+        {
+            "partition": "01J8ZK3V9Q4XW5T6Y7R8S9A0BD",
+            "at": "2026-09-01T10:15:07+00:00",
+            "event": {
+                "action": "user.login",
+                "actor_type": "user",
+                "actor_id": "usr_01",
+                "organization_id": "01J8ZM0RGA0000000000000001",
+                "target_type": null,
+                "target_id": null,
+                "context_php": "a:1:{s:6:\"method\";s:7:\"passkey\";}",
+                "ip": null
+            },
+            "expect": {
+                "environment_id": "01J8ZK3V9Q4XW5T6Y7R8S9A0BD",
+                "scope": "01J8ZM0RGA0000000000000001",
+                "sequence": 1,
+                "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+                "hash": "5152f68bf50ac2baa6a84ac2a61774b991b958122e7678b8c2385d2e117406bd",
+                "canonical": "{\"sequence\":1,\"environment_id\":\"01J8ZK3V9Q4XW5T6Y7R8S9A0BD\",\"scope\":\"01J8ZM0RGA0000000000000001\",\"organization_id\":\"01J8ZM0RGA0000000000000001\",\"actor_type\":\"user\",\"actor_id\":\"usr_01\",\"action\":\"user.login\",\"target_type\":null,\"target_id\":null,\"context\":{\"method\":\"passkey\"},\"ip\":null,\"recorded_at\":1788257707}"
+            }
+        },
+        {
+            "partition": "01J8ZK3V9Q4XW5T6Y7R8S9A0BD",
+            "at": "2026-09-01T10:16:07+00:00",
+            "event": {
+                "action": "user.logout",
+                "actor_type": "user",
+                "actor_id": "usr_01",
+                "organization_id": "01J8ZM0RGA0000000000000001",
+                "target_type": null,
+                "target_id": null,
+                "context_php": "a:0:{}",
+                "ip": null
+            },
+            "expect": {
+                "environment_id": "01J8ZK3V9Q4XW5T6Y7R8S9A0BD",
+                "scope": "01J8ZM0RGA0000000000000001",
+                "sequence": 2,
+                "prev_hash": "5152f68bf50ac2baa6a84ac2a61774b991b958122e7678b8c2385d2e117406bd",
+                "hash": "03c46fcb17a93c4af23a43cc6063231335b07fa94cb0962e09e2ac13adf950d7",
+                "canonical": "{\"sequence\":2,\"environment_id\":\"01J8ZK3V9Q4XW5T6Y7R8S9A0BD\",\"scope\":\"01J8ZM0RGA0000000000000001\",\"organization_id\":\"01J8ZM0RGA0000000000000001\",\"actor_type\":\"user\",\"actor_id\":\"usr_01\",\"action\":\"user.logout\",\"target_type\":null,\"target_id\":null,\"context\":[],\"ip\":null,\"recorded_at\":1788257767}"
+            }
+        }
+    ]
+}
