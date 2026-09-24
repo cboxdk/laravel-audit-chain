@@ -51,7 +51,7 @@ class DatabaseChainInventory implements ChainInventory
             $scope = $row->scope ?? null;
             $head = $row->head_sequence ?? null;
 
-            if (! is_string($partition) || $partition === '' || ! is_string($scope) || $scope === '' || ! is_numeric($head)) {
+            if (! is_string($partition) || ! is_string($scope) || ! is_numeric($head)) {
                 continue;
             }
 
@@ -85,7 +85,7 @@ class DatabaseChainInventory implements ChainInventory
             $scope = $row->scope ?? null;
             $sequence = $row->attested_sequence ?? null;
 
-            if (! is_string($partition) || $partition === '' || ! is_string($scope) || $scope === '' || ! is_numeric($sequence)) {
+            if (! is_string($partition) || ! is_string($scope) || ! is_numeric($sequence)) {
                 continue;
             }
 

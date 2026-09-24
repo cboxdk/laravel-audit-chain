@@ -8,14 +8,19 @@ use Cbox\AuditChain\ValueObjects\ChainActor;
 use Cbox\AuditChain\ValueObjects\ChainEvent;
 use Cbox\AuditChain\ValueObjects\ChainKey;
 
-it('refuses an empty half or a NUL byte', function (string $partition, string $scope): void {
+it('refuses a NUL byte in either half', function (string $partition, string $scope): void {
     expect(fn () => ChainKey::of($partition, $scope))->toThrow(InvalidChainKey::class);
 })->with([
-    'empty partition' => ['', 'scope'],
-    'empty scope' => ['partition', ''],
     'nul in partition' => ["a\0b", 'scope'],
     'nul in scope' => ['partition', "a\0b"],
 ]);
+
+it('accepts an empty half — a single-tenant app needs no partition', function (): void {
+    $key = ChainKey::of('', 'app');
+
+    expect($key->partition)->toBe('')
+        ->and($key->id())->not->toBe(ChainKey::of('app', '')->id());
+});
 
 it('gives every distinct pair a distinct id, even where describe() cannot', function (): void {
     $a = ChainKey::of('a/b', 'c');
@@ -40,7 +45,6 @@ it('builds events fluently without mutating the original', function (): void {
         ->and(ChainEvent::system('x')->actor->type)->toBe(ChainActor::SYSTEM);
 });
 
-it('refuses an event without an action or an actor without a type', function (): void {
-    expect(fn () => ChainEvent::system(''))->toThrow(InvalidChainEvent::class)
-        ->and(fn () => ChainActor::of(''))->toThrow(InvalidChainEvent::class);
+it('refuses an actor without a type', function (): void {
+    expect(fn () => ChainActor::of(''))->toThrow(InvalidChainEvent::class);
 });

@@ -18,9 +18,10 @@ use Cbox\AuditChain\Exceptions\InvalidChainKey;
  * Both halves are stored on every entry AND go into its hash (with the default codec),
  * so an entry cannot be moved between chains by rewriting either column.
  *
- * Neither half may be empty or contain a NUL byte. NUL is refused because it is the
- * one byte that can never appear in either, which is what lets code build an
- * unambiguous map key from the pair (see {@see self::id()}).
+ * Either half may be empty (a single-tenant app can use `ChainKey::of('', 'app')`), but
+ * neither may contain a NUL byte: NUL is the one byte that can never appear in either,
+ * which is what lets code build an unambiguous map key from the pair (see
+ * {@see self::id()}).
  */
 readonly class ChainKey
 {
@@ -65,10 +66,6 @@ readonly class ChainKey
 
     private static function assertPart(string $name, string $value): void
     {
-        if ($value === '') {
-            throw InvalidChainKey::empty($name);
-        }
-
         if (str_contains($value, "\0")) {
             throw InvalidChainKey::containsNul($name);
         }

@@ -48,7 +48,7 @@ one failure a tamper-evident log must never have.
 
 ## Value objects
 
-- `ChainKey(partition, scope)`: which chain. Neither half may be empty or contain NUL.
+- `ChainKey(partition, scope)`: which chain. Either half may be empty; neither may contain a NUL byte.
 - `ChainEvent(action, actor, targetType, targetId, context, ip, columns)` with a
   `ChainActor(type, id)`.
 - `ChainVerification(valid, verifiedCount, brokenAtSequence, break)`, where `break` is a

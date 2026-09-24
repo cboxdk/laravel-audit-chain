@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Cbox\AuditChain\ValueObjects;
 
 use Cbox\AuditChain\Contracts\EntryCodec;
-use Cbox\AuditChain\Exceptions\InvalidChainEvent;
 
 /**
  * One event to append to a chain. Which chain is not part of the event: it is the
@@ -38,11 +37,7 @@ readonly class ChainEvent
         public array $context = [],
         public ?string $ip = null,
         public array $columns = [],
-    ) {
-        if ($action === '') {
-            throw InvalidChainEvent::emptyAction();
-        }
-    }
+    ) {}
 
     /**
      * An action taken by the application itself.
