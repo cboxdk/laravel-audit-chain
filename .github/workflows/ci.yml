@@ -1,0 +1,109 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ["8.4", "8.5"]
+        # The current and the previous Laravel major (13 and 12).
+        testbench: ["^10.0", "^11.0"]
+    name: PHP ${{ matrix.php }} · testbench ${{ matrix.testbench }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+          tools: composer:v2
+          extensions: sodium, pdo_sqlite
+      - name: Pin the Laravel major
+        run: composer require "orchestra/testbench:${{ matrix.testbench }}" --dev --no-update --no-interaction
+      - run: composer update --no-interaction --no-progress --prefer-dist
+      - name: Pint
+        run: vendor/bin/pint --test
+      - name: PHPStan
+        run: vendor/bin/phpstan analyse --no-progress --memory-limit=1G
+      - name: Pest
+        run: php -d memory_limit=1G vendor/bin/pest
+      - name: Security audit
+        run: composer audit --no-dev
+      - name: License compliance
+        run: composer license-check
+      # composer.lock is not committed (a library resolves fresh), so the SBOM is checked
+      # by dependency SET, not exact versions: an upstream patch release must not fail
+      # the build, a dependency added or removed without regenerating the SBOM must.
+      - name: SBOM dependency set
+        if: matrix.php == '8.4' && matrix.testbench == '^11.0'
+        run: composer sbom-check
+
+  # The append path's concurrency guarantees depend on the engine, and SQLite cannot run
+  # two writers. Each cell runs the WHOLE suite against a real server, including the test
+  # that forks eight writers onto one chain. pcntl is load-bearing: without it that test
+  # skips itself and the cell proves nothing about row locking.
+  engines:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - driver: pgsql
+            image: postgres:16
+            port: 5432
+            health: pg_isready -U audit_chain -d audit_chain
+          - driver: mysql
+            image: mysql:8.4
+            port: 3306
+            health: mysqladmin ping -h 127.0.0.1 -u root -proot
+          - driver: mariadb
+            image: mariadb:11.8
+            port: 3306
+            health: healthcheck.sh --connect --innodb_initialized
+    name: ${{ matrix.image }}
+    services:
+      db:
+        image: ${{ matrix.image }}
+        env:
+          POSTGRES_DB: audit_chain
+          POSTGRES_USER: audit_chain
+          POSTGRES_PASSWORD: secret
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: audit_chain
+          MYSQL_USER: audit_chain
+          MYSQL_PASSWORD: secret
+          MARIADB_ROOT_PASSWORD: root
+          MARIADB_DATABASE: audit_chain
+          MARIADB_USER: audit_chain
+          MARIADB_PASSWORD: secret
+        ports:
+          - ${{ matrix.port }}:${{ matrix.port }}
+        options: >-
+          --health-cmd "${{ matrix.health }}"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 30
+    env:
+      DB_CONNECTION: ${{ matrix.driver }}
+      DB_HOST: 127.0.0.1
+      DB_PORT: ${{ matrix.port }}
+      DB_DATABASE: audit_chain
+      DB_USERNAME: audit_chain
+      DB_PASSWORD: secret
+    steps:
+      - uses: actions/checkout@v7
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          coverage: none
+          tools: composer:v2
+          extensions: sodium, pdo_mysql, pdo_pgsql, pcntl
+      - run: composer update --no-interaction --no-progress --prefer-dist
+      - name: Pest (full suite, including the forking concurrency test)
+        run: php -d memory_limit=1G vendor/bin/pest
