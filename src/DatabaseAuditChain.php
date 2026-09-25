@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Cbox\AuditChain;
 
 use Cbox\AuditChain\Contracts\AuditChain;
+use Cbox\AuditChain\Contracts\ChainLock;
 use Cbox\AuditChain\Contracts\CheckpointAnchor;
 use Cbox\AuditChain\Contracts\CheckpointSigner;
 use Cbox\AuditChain\Contracts\EntryCodec;
@@ -13,6 +14,7 @@ use Cbox\AuditChain\Exceptions\CannotAppendToChain;
 use Cbox\AuditChain\Exceptions\CannotCheckpointEmptyChain;
 use Cbox\AuditChain\Exceptions\CheckpointClaimsMalformed;
 use Cbox\AuditChain\Exceptions\UnhashedColumn;
+use Cbox\AuditChain\Locking\AnchorRowChainLock;
 use Cbox\AuditChain\Models\ChainCheckpoint;
 use Cbox\AuditChain\Models\ChainEntry;
 use Cbox\AuditChain\Storage\ChainModels;
@@ -45,9 +47,9 @@ class DatabaseAuditChain implements AuditChain
     public const GENESIS_HASH = '0000000000000000000000000000000000000000000000000000000000000000';
 
     /**
-     * The chain position appenders serialise on. See record().
+     * The chain position the default lock serialises on. See {@see AnchorRowChainLock}.
      */
-    public const ANCHOR_SEQUENCE = 1;
+    public const ANCHOR_SEQUENCE = AnchorRowChainLock::ANCHOR_SEQUENCE;
 
     /**
      * How many times an append may re-read the head and re-claim a position before
@@ -71,12 +73,21 @@ class DatabaseAuditChain implements AuditChain
      */
     public const MAX_BACKOFF_MILLISECONDS = 64;
 
+    private readonly ChainLock $lock;
+
+    /**
+     * @param  ChainLock|null  $lock  how appenders serialise; the anchor-row lock when
+     *                                omitted (the measured default)
+     */
     public function __construct(
         private readonly ChainModels $models,
         private readonly EntryCodec $codec,
         private readonly CheckpointSigner $signer,
         private readonly CheckpointAnchor $anchor,
-    ) {}
+        ?ChainLock $lock = null,
+    ) {
+        $this->lock = $lock ?? new AnchorRowChainLock;
+    }
 
     /**
      * Append one entry to the chain.
@@ -84,8 +95,10 @@ class DatabaseAuditChain implements AuditChain
      * Two writers must not compute the same next sequence, and the append must not
      * be lost when they try. Both are handled here, in that order:
      *
-     * 1. Appenders serialise on the chain's ANCHOR row (sequence 1) rather than on
-     *    its head. Under READ COMMITTED a blocked `FOR UPDATE` re-checks its
+     * 1. Appenders to one chain serialise on the bound {@see ChainLock}, taken as
+     *    the first statement of the attempt's transaction. The default,
+     *    {@see AnchorRowChainLock}, locks the chain's ANCHOR row (sequence 1) rather
+     *    than its head: under READ COMMITTED a blocked `FOR UPDATE` re-checks its
      *    predicate against the row it was waiting on, NOT against the
      *    `ORDER BY sequence DESC LIMIT 1` that picked it — so a waiter on the head
      *    wakes still holding the OLD head and computes a sequence that has just
@@ -95,15 +108,15 @@ class DatabaseAuditChain implements AuditChain
      *    100 appends went from 100 written / 700 lost to 800 written / 0 lost.
      *
      * 2. The unique(partition, scope, sequence) violation is caught and the append
-     *    RE-READS the head and retries. This covers the one window the anchor
-     *    cannot: the first entry of a chain, where there is no anchor to lock yet.
-     *    It converges in one extra round — after the first winner commits, every
-     *    retrier finds the anchor and queues on it.
+     *    RE-READS the head and retries. This covers any window the lock cannot —
+     *    for the anchor lock, the first entry of a chain, where there is no anchor
+     *    to lock yet. It converges in one extra round — after the first winner
+     *    commits, every retrier finds the anchor and queues on it.
      *
      * 3. A SERIALISATION FAILURE (SQLSTATE 40001 / deadlock) is retried on the same
      *    ladder, with a jittered pause. This is the genesis race on InnoDB: see
-     *    anchorId() for why an empty chain does not take a gap lock, and why a
-     *    bounded retry is still kept behind that.
+     *    AnchorRowChainLock::anchorId() for why an empty chain does not take a gap
+     *    lock, and why a bounded retry is still kept behind that.
      *
      * A plain `transaction(..., attempts: 3)` does neither of the first two:
      * Laravel's concurrency detector matches SQLSTATE 40001 and deadlock messages,
@@ -135,14 +148,9 @@ class DatabaseAuditChain implements AuditChain
 
         for ($attempt = 1; ; $attempt++) {
             try {
-                // Located BEFORE the transaction opens, and re-located on every
-                // attempt. See appendOnce() for both halves of why.
-                $anchorId = $this->anchorId($key);
-
-                return $this->models->connection()->transaction(
-                    fn (): ChainEntry => $this->appendOnce($key, $event, $anchorId),
-                    attempts: 1,
-                );
+                // One attempt = one transaction, opened by the lock strategy with the
+                // chain's lock as its first statement. See ChainLock.
+                return $this->lock->withLock($this->models, $key, fn (): ChainEntry => $this->appendOnce($key, $event));
             } catch (QueryException $collision) {
                 if (! $this->isContention($collision)) {
                     throw $collision;
@@ -264,26 +272,16 @@ class DatabaseAuditChain implements AuditChain
     }
 
     /**
-     * One append attempt, inside its own transaction. Every attempt re-reads the
-     * head — a retry that reused the stale head would collide forever.
+     * One append attempt, inside the transaction the lock strategy opened, after it
+     * took the chain's lock. Every attempt re-reads the head — a retry that reused the
+     * stale head would collide forever.
      *
-     * `$anchorId` is the chain's genesis row, or null when the chain has none yet.
-     * It is found by the CALLER, outside this transaction, and that placement is
-     * load-bearing on MySQL and MariaDB — see anchorId().
+     * The head read takes no lock of its own: the strategy's lock already excludes
+     * every other appender on this chain, and where it cannot (the anchor strategy on an
+     * empty chain) the unique key plus the retry in record() makes the read safe.
      */
-    private function appendOnce(ChainKey $key, ChainEvent $event, int|string|null $anchorId): ChainEntry
+    private function appendOnce(ChainKey $key, ChainEvent $event): ChainEntry
     {
-        if ($anchorId !== null) {
-            $this->lockAnchor($anchorId);
-        }
-
-        // Holding the anchor already excludes every other appender on this chain, so
-        // the head read needs no lock of its own. And when there is no anchor to hold
-        // (an empty chain, or one whose genesis row is gone) this deliberately takes
-        // NO lock either: on an empty chain every locking read is a range predicate
-        // that matches nothing, which InnoDB answers with a gap lock, which is the
-        // deadlock. Step 2 in record() — the unique key plus a retry — is what makes
-        // the unlocked read safe.
         $last = $this->headEntry($key);
 
         if ($last === null) {
@@ -349,71 +347,6 @@ class DatabaseAuditChain implements AuditChain
         $ceiling = min(1 << min($attempt, 8), self::MAX_BACKOFF_MILLISECONDS);
 
         usleep(random_int(0, $ceiling) * 1000);
-    }
-
-    /**
-     * Find the chain's anchor — its genesis row (sequence 1) — or null if the chain
-     * is empty. Entries are append-only and never pruned, so that row exists for
-     * every non-empty chain, is never updated, and keeps its id forever.
-     *
-     * ## Why the anchor is FOUND unlocked, and found OUTSIDE the transaction
-     *
-     * The obvious spelling — one `where sequence = 1 … for update` inside the
-     * transaction — is a locking read whose predicate matches NO ROW while the chain
-     * is empty, and InnoDB answers that by locking the gap the row would have
-     * occupied. Eight processes opening a brand-new chain each take that gap lock,
-     * then each needs an insert-intention lock inside the very gap the other seven
-     * hold. MariaDB 11.8 resolves the pile-up as SQLSTATE 40001 (error 1213) rather
-     * than the duplicate key step 2 absorbs. Measured: 6 of 800 appends lost on
-     * MariaDB 11.8.8, 800/800 on MySQL 8.4 and PostgreSQL 16 — the same statement,
-     * a different deadlock detector. So the search is a PLAIN read and the lock is
-     * taken separately, by PRIMARY KEY, on a row already known to exist: an exact
-     * primary-key match takes a record lock and can never take a gap lock.
-     *
-     * That leaves WHERE the plain read runs, which is not a detail. MySQL and MariaDB
-     * default to REPEATABLE READ, where a transaction's FIRST consistent read fixes
-     * the snapshot every later consistent read in it is answered from. Run the search
-     * inside the transaction and it becomes that first read — so a waiter that then
-     * blocks on the anchor wakes up and reads the head from a snapshot taken BEFORE
-     * it got the lock, i.e. the exact stale head the anchor exists to prevent. This
-     * was measured, not reasoned about: with the search inside the transaction,
-     * MariaDB went from 6 lost appends in 800 to the whole retry budget exhausted on
-     * duplicate keys, hundreds of times. Outside, the first statement in the
-     * transaction is the anchor's locking read (locking reads see the latest
-     * committed row, snapshot or not), the head read after it establishes the
-     * snapshot, and it sees the previous holder's commit.
-     *
-     * The cost is one extra indexed lookup per append on a key the append uses anyway.
-     *
-     * Two reads mean the anchor could vanish between them — only tail deletion does
-     * that, which is tampering. Then the locking read finds nothing, the append falls
-     * through to the unique key, and that is the same path as a genuinely empty chain.
-     */
-    private function anchorId(ChainKey $key): int|string|null
-    {
-        $model = $this->models->newEntry();
-
-        $anchorId = $this->models->entriesOf($key)
-            ->where('sequence', self::ANCHOR_SEQUENCE)
-            ->value($model->getKeyName());
-
-        return is_string($anchorId) || is_int($anchorId) ? $anchorId : null;
-    }
-
-    /**
-     * Take the chain's serialisation lock: an exact primary-key match, so a record
-     * lock and never a gap lock.
-     *
-     * SQLite compiles no lock clause; its writes serialise on the database anyway.
-     */
-    private function lockAnchor(int|string $anchorId): void
-    {
-        $model = $this->models->newEntry();
-
-        $this->models->entries()
-            ->whereKey($anchorId)
-            ->lockForUpdate()
-            ->value($model->getKeyName());
     }
 
     /**

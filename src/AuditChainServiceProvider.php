@@ -13,9 +13,14 @@ use Cbox\AuditChain\Console\VerifyCommand;
 use Cbox\AuditChain\Contracts\AuditChain;
 use Cbox\AuditChain\Contracts\ChainContext;
 use Cbox\AuditChain\Contracts\ChainInventory;
+use Cbox\AuditChain\Contracts\ChainLock;
 use Cbox\AuditChain\Contracts\CheckpointAnchor;
 use Cbox\AuditChain\Contracts\CheckpointSigner;
 use Cbox\AuditChain\Contracts\EntryCodec;
+use Cbox\AuditChain\Exceptions\UnsupportedChainLock;
+use Cbox\AuditChain\Locking\AnchorRowChainLock;
+use Cbox\AuditChain\Locking\AutoChainLock;
+use Cbox\AuditChain\Locking\PostgresAdvisoryChainLock;
 use Cbox\AuditChain\Signing\Ed25519CheckpointSigner;
 use Cbox\AuditChain\Storage\ChainModels;
 use Cbox\AuditChain\Storage\DatabaseChainInventory;
@@ -43,6 +48,7 @@ class AuditChainServiceProvider extends ServiceProvider
         $this->app->singletonIf(CheckpointAnchor::class, static fn (Container $app): CheckpointAnchor => self::anchorFromConfig($app));
         $this->app->singletonIf(ChainContext::class, PassthroughChainContext::class);
         $this->app->singletonIf(ChainInventory::class, DatabaseChainInventory::class);
+        $this->app->singletonIf(ChainLock::class, static fn (): ChainLock => self::lockFromConfig());
         $this->app->singletonIf(AuditChain::class, DatabaseAuditChain::class);
         $this->app->singletonIf(Checkpointer::class);
         $this->app->singletonIf(ChainVerifier::class);
@@ -110,6 +116,23 @@ class AuditChainServiceProvider extends ServiceProvider
         $time = config($key, $default);
 
         return is_string($time) && preg_match('/\A([01]?\d|2[0-3]):[0-5]\d\z/', $time) === 1 ? $time : $default;
+    }
+
+    /**
+     * The anchor-row lock unless configured otherwise: it is the measured default, and
+     * the one every chain written so far was written under.
+     */
+    private static function lockFromConfig(): ChainLock
+    {
+        $driver = config('audit-chain.lock.driver', 'anchor');
+        $driver = is_string($driver) && $driver !== '' ? $driver : 'anchor';
+
+        return match ($driver) {
+            'anchor' => new AnchorRowChainLock,
+            'advisory' => new PostgresAdvisoryChainLock,
+            'auto' => new AutoChainLock,
+            default => throw UnsupportedChainLock::unknown($driver),
+        };
     }
 
     private static function anchorFromConfig(Container $app): CheckpointAnchor

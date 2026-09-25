@@ -85,6 +85,11 @@ abstract class TestCase extends Orchestra
                 'prefix' => '',
                 'search_path' => 'public',
                 'sslmode' => 'prefer',
+                // e.g. DB_ISOLATION_LEVEL="repeatable read" — how the concurrency tests
+                // were measured under each engine's non-default isolation level. Unset:
+                // the engine's own default (READ COMMITTED on PostgreSQL, REPEATABLE
+                // READ on MySQL and MariaDB).
+                'isolation_level' => getenv('DB_ISOLATION_LEVEL') ?: null,
             ];
         }
 

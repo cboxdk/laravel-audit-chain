@@ -28,6 +28,27 @@ return [
         'partition_column' => 'partition_key',
     ],
 
+    /*
+     * How concurrent appends to one chain are serialised.
+     *
+     * - `anchor` (default): SELECT … FOR UPDATE on the chain's first entry. Works on
+     *   every engine; measured under contention on PostgreSQL 16, MySQL 8.4 and
+     *   MariaDB 11.8. On PostgreSQL and MySQL 8 the runtime database role needs UPDATE
+     *   on one column of the entry table for it (a row lock is a write privilege there).
+     * - `advisory`: a transaction-scoped PostgreSQL advisory lock per chain. PostgreSQL
+     *   only; needs no table privilege, so the runtime role can hold SELECT and INSERT
+     *   and nothing else. Refused on any other engine.
+     * - `auto`: `advisory` on PostgreSQL, `anchor` elsewhere.
+     *
+     * Switching strategies is safe at any time (it changes locking, not what is
+     * written), but every process appending to the same chains must use the same one:
+     * an anchor-locker and an advisory-locker do not exclude each other. See
+     * docs/security/least-privilege.md for the exact grants each needs.
+     */
+    'lock' => [
+        'driver' => env('AUDIT_CHAIN_LOCK', 'anchor'),
+    ],
+
     'models' => [
         'entry' => AuditChainEntry::class,
         'checkpoint' => AuditChainCheckpoint::class,

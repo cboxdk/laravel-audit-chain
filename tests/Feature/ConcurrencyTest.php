@@ -3,8 +3,10 @@
 declare(strict_types=1);
 
 use Cbox\AuditChain\Contracts\AuditChain;
+use Cbox\AuditChain\Contracts\ChainLock;
 use Cbox\AuditChain\Exceptions\CannotAppendToChain;
 use Cbox\AuditChain\Models\AuditChainEntry;
+use Cbox\AuditChain\Tests\Support\ForkedAppenders;
 use Cbox\AuditChain\ValueObjects\ChainEvent;
 use Cbox\AuditChain\ValueObjects\ChainKey;
 use Illuminate\Database\Events\QueryExecuted;
@@ -29,77 +31,24 @@ function concurrencyKey(): ChainKey
     return ChainKey::of('tenant_a', 'contended');
 }
 
-it('loses no append when many processes contend on one chain', function (): void {
+it('loses no append when many processes contend on one chain', function (string $strategy): void {
+    if ($strategy === 'advisory' && DB::connection()->getDriverName() !== 'pgsql') {
+        $this->markTestSkipped('the advisory lock is PostgreSQL-only');
+    }
+
+    config(['audit-chain.lock.driver' => $strategy]);
+    app()->forgetInstance(ChainLock::class);
+    app()->forgetInstance(AuditChain::class);
+
+    // Committed rows outlive the test, so they are removed however it ends — a
+    // failing case must not leave rows behind for the next dataset to trip over.
+    DB::commit();
+    $this->beforeApplicationDestroyed(fn () => DB::table('audit_chain_entries')->delete());
+
     $writers = 8;
     $perWriter = 100;
 
-    // Resolve everything the children will need while there is still one process, so
-    // a lazy singleton is not built concurrently by eight of them.
-    app(AuditChain::class);
-
-    // Commit RefreshDatabase's wrapping transaction: the children are separate
-    // connections and would otherwise not see the schema. (Its teardown rollback then
-    // becomes a no-op, so the test clears up after itself below.)
-    DB::commit();
-
-    // Drop the parent's socket next: a forked child inherits the file descriptor, and
-    // two processes talking over one connection corrupts the protocol stream.
-    DB::disconnect();
-
-    $results = sys_get_temp_dir().'/audit-chain-'.bin2hex(random_bytes(8));
-    mkdir($results);
-
-    $pids = [];
-
-    for ($writer = 0; $writer < $writers; $writer++) {
-        $pid = pcntl_fork();
-
-        expect($pid)->not->toBe(-1, 'could not fork an appender');
-
-        if ($pid === 0) {
-            $written = 0;
-            $errors = [];
-
-            for ($n = 0; $n < $perWriter; $n++) {
-                try {
-                    app(AuditChain::class)->record(concurrencyKey(), ChainEvent::system('concurrent.append'));
-                    $written++;
-                } catch (Throwable $e) {
-                    $errors[] = $e::class.': '.$e->getMessage();
-                }
-            }
-
-            file_put_contents(
-                $results.'/'.$writer.'.json',
-                (string) json_encode(['written' => $written, 'errors' => array_slice($errors, 0, 3)]),
-            );
-
-            // Leave without unwinding: PHPUnit's shutdown handlers would report the
-            // child as a second test run and flush the parent's output buffers.
-            posix_kill(posix_getpid(), SIGKILL);
-        }
-
-        $pids[] = $pid;
-    }
-
-    foreach ($pids as $pid) {
-        pcntl_waitpid($pid, $status);
-    }
-
-    $written = 0;
-    $errors = [];
-
-    for ($writer = 0; $writer < $writers; $writer++) {
-        $report = json_decode((string) file_get_contents($results.'/'.$writer.'.json'), true);
-
-        expect($report)->toBeArray();
-
-        $written += $report['written'];
-        $errors = array_merge($errors, $report['errors']);
-    }
-
-    array_map('unlink', (array) glob($results.'/*'));
-    rmdir($results);
+    ['written' => $written, 'errors' => $errors] = ForkedAppenders::run(concurrencyKey(), $writers, $perWriter);
 
     $expected = $writers * $perWriter;
 
@@ -120,12 +69,8 @@ it('loses no append when many processes contend on one chain', function (): void
         ->and($chain)->toBe(range(1, $expected));
 
     // ...and the linkage survived being written by eight processes at once.
-    $verified = app(AuditChain::class)->verify(concurrencyKey())->valid;
-
-    DB::table('audit_chain_entries')->delete();
-
-    expect($verified)->toBeTrue();
-})->skip(
+    expect(app(AuditChain::class)->verify(concurrencyKey())->valid)->toBeTrue();
+})->with(['anchor', 'advisory'])->skip(
     fn (): bool => ! onServerEngine() || ! function_exists('pcntl_fork'),
     'needs a server engine and pcntl: set DB_CONNECTION=pgsql (or mysql / mariadb) to run it',
 );

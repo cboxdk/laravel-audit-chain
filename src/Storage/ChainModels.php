@@ -10,7 +10,7 @@ use Cbox\AuditChain\Models\AuditChainEntry;
 use Cbox\AuditChain\Models\ChainCheckpoint;
 use Cbox\AuditChain\Models\ChainEntry;
 use Cbox\AuditChain\ValueObjects\ChainKey;
-use Illuminate\Database\ConnectionInterface;
+use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 
@@ -146,7 +146,7 @@ readonly class ChainModels
     /**
      * The connection the entries live on — the one an append's transaction must run on.
      */
-    public function connection(): ConnectionInterface
+    public function connection(): Connection
     {
         return $this->newEntry()->getConnection();
     }
@@ -154,7 +154,7 @@ readonly class ChainModels
     /**
      * The connection the checkpoints live on.
      */
-    public function checkpointConnection(): ConnectionInterface
+    public function checkpointConnection(): Connection
     {
         return $this->newCheckpoint()->getConnection();
     }
