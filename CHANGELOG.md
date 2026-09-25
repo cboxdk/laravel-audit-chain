@@ -7,6 +7,10 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-09-25
+
+First release.
+
 ### Added
 
 - `ChainLock` contract: how appenders to one chain are serialised, selected by
@@ -61,3 +65,6 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   REPEATABLE READ or SERIALIZABLE, contended appends exhaust their retries, loudly), and
   MariaDB at SERIALIZABLE loses 2 of 800 contended appends to deadlocks past the budget.
   The advisory lock is 800/800 at every level on PostgreSQL.
+
+[Unreleased]: https://github.com/cboxdk/laravel-audit-chain/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/cboxdk/laravel-audit-chain/releases/tag/v0.1.0
