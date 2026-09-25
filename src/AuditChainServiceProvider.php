@@ -8,6 +8,7 @@ use Cbox\AuditChain\Anchoring\FilesystemCheckpointAnchor;
 use Cbox\AuditChain\Anchoring\NullCheckpointAnchor;
 use Cbox\AuditChain\Codec\V1EntryCodec;
 use Cbox\AuditChain\Console\CheckpointCommand;
+use Cbox\AuditChain\Console\GrantsCommand;
 use Cbox\AuditChain\Console\KeygenCommand;
 use Cbox\AuditChain\Console\VerifyCommand;
 use Cbox\AuditChain\Contracts\AuditChain;
@@ -67,7 +68,7 @@ class AuditChainServiceProvider extends ServiceProvider
                 __DIR__.'/../database/migrations' => database_path('migrations'),
             ], 'audit-chain-migrations');
 
-            $this->commands([CheckpointCommand::class, VerifyCommand::class, KeygenCommand::class]);
+            $this->commands([CheckpointCommand::class, VerifyCommand::class, KeygenCommand::class, GrantsCommand::class]);
         }
 
         $this->scheduleIfEnabled();
