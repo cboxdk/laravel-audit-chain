@@ -36,6 +36,9 @@ $chain->checkpoint($key);      // sign the head, so truncation becomes detectabl
   any break.
 - **Contracts for everything**: bring your own codec, signer, anchor, tenant context or
   models, including adopting a chain another implementation wrote without rewriting it.
+- **Least privilege**: run the app as a role that can only SELECT and INSERT, with
+  append-only triggers behind it. `audit-chain:grants` prints the exact SQL per engine, and
+  the setup is tested on PostgreSQL, MySQL and MariaDB.
 - **A test fake** (`FakeAuditChain`, `InteractsWithAuditChain`) with assertions.
 
 ## Honest scope

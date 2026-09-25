@@ -12,6 +12,8 @@ description: Task-oriented recipes — anchoring to R2, adopting an existing cha
   extending a hash chain another implementation wrote, without rewriting a row.
 - **[Rotate signing keys](rotate-signing-keys.md)**: switch to a new checkpoint key
   without invalidating the checkpoints the old one signed.
+- **[Run as a least-privilege database role](run-as-a-least-privilege-role.md)**: let the
+  app read and append, and nothing else, with append-only triggers behind it.
 - **[Schedule checkpoints and verification](schedule-checkpoints.md)**: the two opt-in
   scheduled passes, and when to turn each on.
 - **[Verify from outside the application](verify-offline.md)**: re-check an exported

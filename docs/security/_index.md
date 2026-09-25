@@ -7,6 +7,8 @@ description: The threat model, the cryptography used, and how to report a vulner
 # Security
 
 - **[Threat model](threat-model.md)**: who this defends against, how, and where it stops.
+- **[Least privilege](least-privilege.md)**: run the app as a role that can only read and
+  append, with the exact grants per engine and lock strategy.
 
 ## Cryptography
 

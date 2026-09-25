@@ -16,6 +16,7 @@ a service provider and it wins, whichever provider registers first.
 - **[Chain context](chain-context.md)**: sign and verify each chain inside its tenant's
   context.
 - **[Your own models](models.md)**: keep the chain in tables you own.
+- **[Chain lock](chain-lock.md)**: how appenders to one chain are serialised.
 
 To wrap behaviour rather than replace it, decorate the contract:
 

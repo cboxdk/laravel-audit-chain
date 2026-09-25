@@ -70,4 +70,14 @@ The same works with `DB_CONNECTION=mysql` (`mysql:8.4`) and `DB_CONNECTION=maria
 (`mariadb:11.8`) on port 3306. On a server engine the suite migrates once per process
 and wraps each test in a transaction, so a run takes seconds, not minutes.
 
+Two more knobs for server engines:
+
+- `DB_ISOLATION_LEVEL` (e.g. `"repeatable read"`) sets the session isolation level, which
+  is how the [isolation matrix](../core-concepts/concurrency.md#isolation-levels-measured)
+  was measured.
+- `DB_ADMIN_USERNAME` / `DB_ADMIN_PASSWORD` name an account that may create users, so
+  `tests/Feature/LeastPrivilegeTest.php` can run on MySQL and MariaDB (`root` in the
+  official images). On PostgreSQL it uses the suite's own account, which is a superuser in
+  the official image. Without it those tests skip on MySQL and MariaDB.
+
 `.github/workflows/ci.yml` runs exactly this for all three engines in its `engines` job.

@@ -43,6 +43,7 @@ description: What the chain, checkpoints and anchors defend against, and what th
 - Turn checkpoints on, after the [one-way-door decision](../core-concepts/checkpoints.md#the-first-checkpoint-is-a-one-way-door).
 - Anchor them to a locked bucket with separate credentials.
 - Schedule `audit-chain:verify` and alert on a non-zero exit.
-- Give the application's database user `INSERT` and `SELECT` on the entry table and no
-  `UPDATE` or `DELETE` where your engine allows it. The package never updates or
-  deletes entries.
+- Run the application as a role that can only SELECT and INSERT on the chain tables, with
+  append-only triggers on both: [Least privilege](least-privilege.md). The package never
+  updates or deletes an entry. On PostgreSQL use the advisory lock; the default anchor lock
+  needs UPDATE on one column there and on MySQL 8, which the trigger then neutralises.

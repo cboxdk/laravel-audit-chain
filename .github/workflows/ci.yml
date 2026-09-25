@@ -54,18 +54,26 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # The least-privilege tests create a runtime role. On PostgreSQL the suite's own
+          # user is a superuser in the official image; MySQL and MariaDB need root.
           - driver: pgsql
             image: postgres:16
             port: 5432
             health: pg_isready -U audit_chain -d audit_chain
+            admin_user: ""
+            admin_password: ""
           - driver: mysql
             image: mysql:8.4
             port: 3306
             health: mysqladmin ping -h 127.0.0.1 -u root -proot
+            admin_user: root
+            admin_password: root
           - driver: mariadb
             image: mariadb:11.8
             port: 3306
             health: healthcheck.sh --connect --innodb_initialized
+            admin_user: root
+            admin_password: root
     name: ${{ matrix.image }}
     services:
       db:
@@ -96,6 +104,8 @@ jobs:
       DB_DATABASE: audit_chain
       DB_USERNAME: audit_chain
       DB_PASSWORD: secret
+      DB_ADMIN_USERNAME: ${{ matrix.admin_user }}
+      DB_ADMIN_PASSWORD: ${{ matrix.admin_password }}
     steps:
       - uses: actions/checkout@v7
       - uses: shivammathur/setup-php@v2
@@ -105,5 +115,12 @@ jobs:
           tools: composer:v2
           extensions: sodium, pdo_mysql, pdo_pgsql, pcntl
       - run: composer update --no-interaction --no-progress --prefer-dist
-      - name: Pest (full suite, including the forking concurrency test)
+      - name: Pest (full suite, including the forking and least-privilege tests)
         run: php -d memory_limit=1G vendor/bin/pest
+      # The advisory lock must hold up at every isolation level; the anchor lock is only
+      # claimed at the engine default, so only the advisory cell is re-run here.
+      - name: Advisory lock under REPEATABLE READ and SERIALIZABLE
+        if: matrix.driver == 'pgsql'
+        run: |
+          DB_ISOLATION_LEVEL="repeatable read" php -d memory_limit=1G vendor/bin/pest --filter='many processes.*advisory'
+          DB_ISOLATION_LEVEL="serializable" php -d memory_limit=1G vendor/bin/pest --filter='many processes.*advisory'

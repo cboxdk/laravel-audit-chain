@@ -12,6 +12,7 @@ description: Every config/audit-chain.php key with its environment variable and 
 | `storage.tables.entries` | | `audit_chain_entries` | Entry table for the package's own model and migration. |
 | `storage.tables.checkpoints` | | `audit_chain_checkpoints` | Checkpoint table. |
 | `storage.partition_column` | | `partition_key` | Column holding a chain key's partition, on both tables. |
+| `lock.driver` | `AUDIT_CHAIN_LOCK` | `anchor` | `anchor`, `advisory` (PostgreSQL only) or `auto`. See [Concurrency](../core-concepts/concurrency.md#lock-strategies). |
 | `models.entry` | | `AuditChainEntry::class` | Entry model; must extend `Models\ChainEntry`. |
 | `models.checkpoint` | | `AuditChainCheckpoint::class` | Checkpoint model; must extend `Models\ChainCheckpoint`. |
 | `codec.extra_columns` | | `[]` | Host columns the default codec hashes under `extra`. Events may only write listed columns. |
@@ -34,3 +35,4 @@ description: Every config/audit-chain.php key with its environment variable and 
 | `audit-chain:checkpoint [--partition=*] [--scope=*] [--force] [--dry-run]` | Sign every chain that advanced since its last checkpoint. Exits non-zero if any chain could not be signed. |
 | `audit-chain:verify [--partition=*] [--scope=*] [--window=N]` | Verify every chain. Exits non-zero if any is broken. |
 | `audit-chain:keygen [--kid=]` | Print a new Ed25519 key pair. Writes nothing. |
+| `audit-chain:grants {role} [--host=%] [--lock=]` | Print least-privilege grants and append-only triggers for this app's tables. Runs nothing. |

@@ -18,6 +18,7 @@ to change behaviour.
 | `CheckpointAnchor` | `Anchoring\NullCheckpointAnchor` (or `FilesystemCheckpointAnchor` by config) | Export each signed checkpoint |
 | `ChainContext` | `Support\PassthroughChainContext` | Run sweep work "as" a chain |
 | `ChainInventory` | `Storage\DatabaseChainInventory` | List stored chains and their heads |
+| `ChainLock` | `Locking\AnchorRowChainLock` (or `PostgresAdvisoryChainLock` / `AutoChainLock` by config) | Serialise appenders to one chain |
 
 Two services build on those:
 

@@ -37,5 +37,8 @@ says only what has been run:
 | MariaDB 11.8 | Run locally before 0.1.0; wired into CI's `engines` job. |
 | SQL Server, others | Never run. |
 
+The [least-privilege](security/least-privilege.md) grants were measured and are tested on
+the same three engines.
+
 The CI workflow runs on GitHub-hosted runners, which only happens once the repository
 is public. Until then the engine results above are from local runs.
